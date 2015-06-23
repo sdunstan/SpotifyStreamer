@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:background="@color/background_material_light">
+
+
+    <ImageView
+        android:layout_width="?android:attr/listPreferredItemHeight"
+        android:layout_height="match_parent"
+        android:id="@+id/songImage"
+        android:contentDescription="@string/song_image_description"
+        android:src="@android:drawable/star_off"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Song Text"
+        android:id="@+id/songTextView"
+        android:layout_toRightOf="@+id/songImage"
+        android:layout_toEndOf="@+id/songImage"
+        android:gravity="center_vertical"
+        android:singleLine="true"
+        android:layout_alignTop="@+id/songImage"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Album Text"
+        android:id="@+id/albumTextView"
+        android:layout_toRightOf="@+id/songImage"
+        android:layout_toEndOf="@+id/songImage"
+        android:layout_below="@+id/songTextView"
+        android:gravity="center_vertical"
+        android:singleLine="true" />
+
+</RelativeLayout>
