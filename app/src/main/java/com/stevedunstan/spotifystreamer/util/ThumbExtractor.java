@@ -1,4 +1,4 @@
-package com.stevedunstan.spotifystreamer.model;
+package com.stevedunstan.spotifystreamer.util;
 
 import java.util.List;
 

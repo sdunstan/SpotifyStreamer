@@ -3,6 +3,8 @@ package com.stevedunstan.spotifystreamer.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.stevedunstan.spotifystreamer.util.ThumbExtractor;
+
 import java.util.List;
 
 import kaaes.spotify.webapi.android.models.Image;

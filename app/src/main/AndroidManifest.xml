@@ -12,21 +12,13 @@
         <activity
             android:name=".SearchSpotifyActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"> <!-- Make this singleTop so up nav retains state -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <service
-            android:name=".services.SpotifyService"
-            android:exported="false" />
-
-        <provider
-            android:name=".data.SpotifyContentProvider"
-            android:authorities="com.stevedunstan.spotifystreamer" />
 
         <activity
             android:name=".ArtistAlbumsDetail"

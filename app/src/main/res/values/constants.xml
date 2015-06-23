@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="SPOTIFY_SERVICE_BROADCAST_ACTION">com.stevedunstan.spotifystreamer.SPOTIFY_SERVICE_BROADCAST_ACTION</string>
-    <string name="SPOTIFY_SERVICE_EXTENDED_DATA_ARTISTS">com.stevedunstan.spotifystreamer.SPOTIFY_SERVICE_ED_ARTISTS</string>
-    <string name="ARTISTS_FILE">artists.ser</string>
-</resources>

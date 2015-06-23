@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.stevedunstan.spotifystreamer.model.SSArtist;
@@ -53,9 +55,6 @@ public class SearchSpotifyActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 SSArtist artist = getArtistArrayAdapter().getItem(position);
-//                Toast toast = Toast.makeText(view.getContext(), "You clicked it: " + artist.getName(), Toast.LENGTH_SHORT);
-//                toast.show();;
-
                 Intent startArtistAlbumIntent = new Intent(getActivity(), ArtistAlbumsDetail.class);
                 startArtistAlbumIntent.putExtra("artist", artist);
                 startActivity(startArtistAlbumIntent);
@@ -136,6 +135,12 @@ public class SearchSpotifyActivityFragment extends Fragment {
         return arrayAdapter;
     }
 
+    private void showNoResultsToast() {
+        Toast toast = Toast.makeText(getActivity(), "No results found for that search.", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();;
+    }
+
     /**
      * ViewHolder pattern from Google I/O 2009 presentation: https://www.youtube.com/watch?v=N6YdwzAvwOA
       */
@@ -179,9 +184,12 @@ public class SearchSpotifyActivityFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<SSArtist> SSArtists) {
+        protected void onPostExecute(List<SSArtist> artists) {
             getArtistArrayAdapter().clear();
-            getArtistArrayAdapter().addAll(SSArtists);
+            if (artists.size() == 0) {
+                showNoResultsToast();
+            }
+            getArtistArrayAdapter().addAll(artists);
         }
 
 
