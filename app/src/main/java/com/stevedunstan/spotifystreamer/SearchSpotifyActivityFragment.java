@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.stevedunstan.spotifystreamer.model.SSArtist;
+import com.stevedunstan.spotifystreamer.util.NetworkUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
 import kaaes.spotify.webapi.android.models.Image;
+import retrofit.RetrofitError;
 
 
 /**
@@ -39,8 +41,10 @@ public class SearchSpotifyActivityFragment extends Fragment {
 
     private ArrayAdapter<SSArtist> arrayAdapter;
     private LayoutInflater mInflater;
+    private NetworkUtil networkUtil;
 
     public SearchSpotifyActivityFragment() {
+        networkUtil = new NetworkUtil();
     }
 
     @Override
@@ -136,7 +140,7 @@ public class SearchSpotifyActivityFragment extends Fragment {
     }
 
     private void showNoResultsToast() {
-        Toast toast = Toast.makeText(getActivity(), "No results found for that search.", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getActivity(), R.string.no_results_for_search, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.TOP, 0, 0);
         toast.show();;
     }
@@ -158,14 +162,19 @@ public class SearchSpotifyActivityFragment extends Fragment {
                 SpotifyApi api = new SpotifyApi();
                 //            api.setAccessToken("");
                 SpotifyService spotifyService = api.getService();
-                ArtistsPager artistsPager = spotifyService.searchArtists(queryStrings[0]);
-                for (kaaes.spotify.webapi.android.models.Artist spotifyArtist : artistsPager.artists.items) {
-                    SSArtist ssArtist = new SSArtist.Builder()
-                            .withId(spotifyArtist.id)
-                            .withName(spotifyArtist.name)
-                            .withImageUrl(getArtistThumbnail(spotifyArtist.images))
-                            .build();
-                    SSArtists.add(ssArtist);
+                try {
+                    ArtistsPager artistsPager = spotifyService.searchArtists(queryStrings[0]);
+                    for (kaaes.spotify.webapi.android.models.Artist spotifyArtist : artistsPager.artists.items) {
+                        SSArtist ssArtist = new SSArtist.Builder()
+                                .withId(spotifyArtist.id)
+                                .withName(spotifyArtist.name)
+                                .withImageUrl(getArtistThumbnail(spotifyArtist.images))
+                                .build();
+                        SSArtists.add(ssArtist);
+                    }
+                }
+                catch (RetrofitError exception) {
+                    networkUtil.showNoNetworkToast(getActivity());
                 }
             }
 

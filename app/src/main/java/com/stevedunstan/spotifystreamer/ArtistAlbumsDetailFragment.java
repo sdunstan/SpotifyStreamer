@@ -3,6 +3,7 @@ package com.stevedunstan.spotifystreamer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.stevedunstan.spotifystreamer.model.SSArtist;
 import com.stevedunstan.spotifystreamer.model.SSSong;
+import com.stevedunstan.spotifystreamer.util.NetworkUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,13 +27,16 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
+import retrofit.RetrofitError;
 
 public class ArtistAlbumsDetailFragment extends Fragment {
 
     private ArrayAdapter<SSSong> topTenAdapter;
     private LayoutInflater mInflater;
+    private NetworkUtil networkUtil;
 
     public ArtistAlbumsDetailFragment() {
+        networkUtil = new NetworkUtil();
     }
 
     @Override
@@ -41,8 +47,13 @@ public class ArtistAlbumsDetailFragment extends Fragment {
         ListView topTenListView = (ListView) view.findViewById(R.id.topSongsListView);
         topTenListView.setAdapter(getTopTenAdapter());
 
-        QueryTopTenTask topTenTask = new QueryTopTenTask();
-        topTenTask.execute(artist.id);
+        if (networkUtil.isNetworkAvailable(getActivity())) {
+            QueryTopTenTask topTenTask = new QueryTopTenTask();
+            topTenTask.execute(artist.id);
+        }
+        else {
+            networkUtil.showNoNetworkToast(getActivity());
+        }
         return view;
     }
 
@@ -111,16 +122,22 @@ public class ArtistAlbumsDetailFragment extends Fragment {
                 SpotifyService spotifyService = api.getService();
                 Map<String, Object> queryMap = new HashMap<String, Object>();
                 queryMap.put("country", "US");
-                Tracks tracks = spotifyService.getArtistTopTrack(artistIds[0], queryMap);
 
-                for (Track track : tracks.tracks) {
-                    SSSong.SSSongBuilder builder = new SSSong.SSSongBuilder();
-                    SSSong song = builder.withAlbumName(track.album.name)
-                            .withId(track.id)
-                            .withName(track.name)
-                            .withImageUrls(track.album.images)
-                            .build();
-                    songs.add(song);
+                try {
+                    Tracks tracks = spotifyService.getArtistTopTrack(artistIds[0], queryMap);
+
+                    for (Track track : tracks.tracks) {
+                        SSSong.SSSongBuilder builder = new SSSong.SSSongBuilder();
+                        SSSong song = builder.withAlbumName(track.album.name)
+                                .withId(track.id)
+                                .withName(track.name)
+                                .withImageUrls(track.album.images)
+                                .build();
+                        songs.add(song);
+                    }
+                }
+                catch (RetrofitError exception) {
+                    networkUtil.showNoNetworkToast(getActivity());
                 }
             }
 
@@ -130,7 +147,14 @@ public class ArtistAlbumsDetailFragment extends Fragment {
         @Override
         protected void onPostExecute(List<SSSong> songs) {
             getTopTenAdapter().clear();
-            getTopTenAdapter().addAll(songs);
+            if (songs.size() > 0) {
+                getTopTenAdapter().addAll(songs);
+            }
+            else {
+                Toast toast = Toast.makeText(getActivity(), R.string.no_results_for_artist, Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.TOP, 0, 0);
+                toast.show();
+            }
         }
     }
 
