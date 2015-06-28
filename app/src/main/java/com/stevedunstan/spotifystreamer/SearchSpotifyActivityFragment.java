@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +15,11 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.stevedunstan.spotifystreamer.model.SSArtist;
-import com.stevedunstan.spotifystreamer.util.NetworkUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,20 +34,21 @@ import retrofit.RetrofitError;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class SearchSpotifyActivityFragment extends Fragment {
+public class SearchSpotifyActivityFragment extends SSFragment {
 
     private ArrayAdapter<SSArtist> arrayAdapter;
     private LayoutInflater mInflater;
-    private NetworkUtil networkUtil;
 
     public SearchSpotifyActivityFragment() {
-        networkUtil = new NetworkUtil();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mInflater = inflater;
         View artistListFragment = inflater.inflate(R.layout.fragment_search_results, container, false);
+
+        setProgressBar((ProgressBar)artistListFragment.findViewById(R.id.progressBar));
+        getProgressBar().setVisibility(ProgressBar.INVISIBLE);
 
         ListView searchResultListView = (ListView) artistListFragment.findViewById(R.id.searchResultListView);
         searchResultListView.setAdapter(getArtistArrayAdapter());
@@ -139,12 +137,6 @@ public class SearchSpotifyActivityFragment extends Fragment {
         return arrayAdapter;
     }
 
-    private void showNoResultsToast() {
-        Toast toast = Toast.makeText(getActivity(), R.string.no_results_for_search, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP, 0, 0);
-        toast.show();;
-    }
-
     /**
      * ViewHolder pattern from Google I/O 2009 presentation: https://www.youtube.com/watch?v=N6YdwzAvwOA
       */
@@ -163,6 +155,7 @@ public class SearchSpotifyActivityFragment extends Fragment {
                 //            api.setAccessToken("");
                 SpotifyService spotifyService = api.getService();
                 try {
+                    setProgressBarVisible(true);
                     ArtistsPager artistsPager = spotifyService.searchArtists(queryStrings[0]);
                     for (kaaes.spotify.webapi.android.models.Artist spotifyArtist : artistsPager.artists.items) {
                         SSArtist ssArtist = new SSArtist.Builder()
@@ -174,7 +167,10 @@ public class SearchSpotifyActivityFragment extends Fragment {
                     }
                 }
                 catch (RetrofitError exception) {
-                    networkUtil.showNoNetworkToast(getActivity());
+                    getNetworkUtil().showNoNetworkToast(getActivity());
+                }
+                finally {
+                    setProgressBarVisible(false);
                 }
             }
 
@@ -196,7 +192,7 @@ public class SearchSpotifyActivityFragment extends Fragment {
         protected void onPostExecute(List<SSArtist> artists) {
             getArtistArrayAdapter().clear();
             if (artists.size() == 0) {
-                showNoResultsToast();
+                showToastAtTop(R.string.no_results_for_search);
             }
             getArtistArrayAdapter().addAll(artists);
         }

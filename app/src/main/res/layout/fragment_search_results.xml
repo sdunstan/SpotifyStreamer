@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SearchSpotifyActivityFragment"
-    android:rowCount="2"
+    android:rowCount="3"
     android:columnCount="1">
 
     <EditText
@@ -15,6 +15,14 @@
         android:imeOptions="actionSearch"
         android:inputType="text"
         android:singleLine="true" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@android:style/Widget.ProgressBar.Large"
+        android:indeterminate="true"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center" />
 
     <ListView
         android:layout_width="match_parent"
