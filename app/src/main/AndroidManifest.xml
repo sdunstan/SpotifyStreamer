@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -12,24 +13,34 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".SearchSpotifyActivity"
+            android:name=".activity.SearchSpotifyActivity"
             android:label="@string/app_name"
-            android:launchMode="singleTop"> <!-- Make this singleTop so up nav retains state -->
+            android:launchMode="singleTop" > <!-- Make this singleTop so up nav retains state -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name=".ArtistAlbumsDetail"
+            android:name=".activity.SongListActivity"
             android:label="@string/title_activity_artist_albums_detail"
-            android:parentActivityName=".SearchSpotifyActivity" >
+            android:launchMode="singleTop"
+            android:parentActivityName=".activity.SearchSpotifyActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.stevedunstan.spotifystreamer.SearchSpotifyActivity" />
+                android:value=".activity.SearchSpotifyActivity" />
         </activity>
+        <activity
+            android:name=".activity.NowPlayingActivity"
+            android:label="@string/title_activity_now_playing"
+            android:parentActivityName=".activity.SongListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.SongListActivity" />
+        </activity>
+
+        <service android:name=".service.MusicPlayerService"/>
     </application>
 
 </manifest>

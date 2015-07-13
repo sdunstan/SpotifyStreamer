@@ -7,7 +7,7 @@ import android.widget.Toast;
 
 import com.stevedunstan.spotifystreamer.R;
 
-public class NetworkUtil {
+public class Network {
 
     public boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

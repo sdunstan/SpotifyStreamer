@@ -1,7 +1,6 @@
-package com.stevedunstan.spotifystreamer;
+package com.stevedunstan.spotifystreamer.fragment;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -13,13 +12,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.stevedunstan.spotifystreamer.R;
 import com.stevedunstan.spotifystreamer.model.SSArtist;
+import com.stevedunstan.spotifystreamer.widget.SSArtistArrayAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,20 +30,15 @@ import kaaes.spotify.webapi.android.models.Image;
 import retrofit.RetrofitError;
 
 
-/**
- * A placeholder fragment containing a simple view.
- */
-public class SearchSpotifyActivityFragment extends SSFragment {
+public class SearchSpotifyFragment extends SSFragment {
 
     private ArrayAdapter<SSArtist> arrayAdapter;
-    private LayoutInflater mInflater;
 
-    public SearchSpotifyActivityFragment() {
+    public SearchSpotifyFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mInflater = inflater;
         View artistListFragment = inflater.inflate(R.layout.fragment_search_results, container, false);
 
         setProgressBar((ProgressBar)artistListFragment.findViewById(R.id.progressBar));
@@ -57,9 +51,7 @@ public class SearchSpotifyActivityFragment extends SSFragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 SSArtist artist = getArtistArrayAdapter().getItem(position);
-                Intent startArtistAlbumIntent = new Intent(getActivity(), ArtistAlbumsDetail.class);
-                startArtistAlbumIntent.putExtra("artist", artist);
-                startActivity(startArtistAlbumIntent);
+                ((ArtistSelectionListener)getActivity()).onArtistSelected(artist);
             }
         });
 
@@ -102,47 +94,9 @@ public class SearchSpotifyActivityFragment extends SSFragment {
 
     public ArrayAdapter<SSArtist> getArtistArrayAdapter() {
         if (arrayAdapter == null) {
-            arrayAdapter = new ArrayAdapter<SSArtist>(getActivity(), R.layout.search_list_item, R.id.artistName, getSearchResults()) {
-
-
-                public View getView(int position, View convertView, ViewGroup parent) {
-                    ViewHolder holder;
-                    if (convertView == null) {
-                        convertView = mInflater.inflate(R.layout.search_list_item, parent, false);
-
-                        holder = new ViewHolder();
-                        holder.text = (TextView) convertView.findViewById(R.id.artistName);
-                        holder.icon = (ImageView) convertView.findViewById(R.id.artistImage);
-                        convertView.setTag(holder);
-                    }
-                    else {
-                        holder = (ViewHolder) convertView.getTag();
-                    }
-
-                    holder.text.setText(this.getItem(position).name);
-                    loadIcon(holder.icon, getItem(position).imageUrl);
-
-                    return convertView;
-                }
-                public void loadIcon(ImageView imageView, String url) {
-                    if (url != null) {
-                        Picasso.with(getActivity()).load(url).placeholder(android.R.drawable.star_big_off).into(imageView);
-                    }
-                    else {
-                        Picasso.with(getActivity()).load(android.R.drawable.star_big_off).into(imageView);
-                    }
-                }
-            };
+            arrayAdapter = new SSArtistArrayAdapter(this, getActivity(), getSearchResults());
         }
         return arrayAdapter;
-    }
-
-    /**
-     * ViewHolder pattern from Google I/O 2009 presentation: https://www.youtube.com/watch?v=N6YdwzAvwOA
-      */
-    static class ViewHolder {
-        TextView text;
-        ImageView icon;
     }
 
     class QueryArtistsTask extends AsyncTask<String,Void,List<SSArtist>> {
@@ -199,4 +153,5 @@ public class SearchSpotifyActivityFragment extends SSFragment {
 
 
     }
+
 }

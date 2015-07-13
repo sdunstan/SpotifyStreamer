@@ -1,5 +1,6 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/fragment"
-    android:name="com.stevedunstan.spotifystreamer.ArtistAlbumsDetailFragment"
-    tools:layout="@layout/fragment_artist_albums_detail" android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/top_ten_songs_container">
+</LinearLayout>
