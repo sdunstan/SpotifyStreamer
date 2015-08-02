@@ -2,6 +2,7 @@ package com.stevedunstan.spotifystreamer.fragment;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,16 @@ import retrofit.RetrofitError;
 public class SongListFragment extends SSFragment {
 
     public static String ARTIST_KEY = "artist";
+    private static final String LOG_KEY = SongListFragment.class.getName();
 
     private ArrayAdapter<SSSong> topTenAdapter;
+    private SSArtist artist;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(ARTIST_KEY, artist);
+    }
 
     public static SongListFragment newInstance(SSArtist artist) {
         Bundle bundle = new Bundle();
@@ -45,31 +54,61 @@ public class SongListFragment extends SSFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_artist_albums_detail, container, false);
 
-        Bundle arguments = getArguments();
-        SSArtist artist = null;
-        if (arguments != null) {
-            artist = arguments.getParcelable(ARTIST_KEY);
-        }
         ListView topTenListView = (ListView) view.findViewById(R.id.topSongsListView);
         topTenListView.setAdapter(getTopTenAdapter());
         topTenListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 SSSong song = getSongList().get(i);
-                ((SongSelectionListener)getActivity()).onSongSelected(song, i);
+                ((SongSelectionListener) getActivity()).onSongSelected(song, i);
             }
         });
 
         setProgressBar((ProgressBar) view.findViewById(R.id.progressBar));
 
-        if (artist != null && getNetworkUtil().isNetworkAvailable(getActivity())) {
+        Bundle arguments = getArguments();
+        if (setArtistFromBundle(arguments, savedInstanceState)) {
+            Log.i(LOG_KEY, "Querying songs for " + artist.name);
+            querySongs(artist.id);
+        }
+
+        return view;
+    }
+
+    private boolean setArtistFromBundle(Bundle arguments, Bundle savedInstanceState) {
+        boolean artistUpdated = false;
+
+        SSArtist artistParam = null;
+        if (arguments != null) {
+            artistParam = arguments.getParcelable(ARTIST_KEY);
+        }
+
+        SSArtist savedArtist = null;
+        if (savedInstanceState != null) {
+          savedArtist = savedInstanceState.getParcelable(ARTIST_KEY);
+        }
+
+        if (artistParam != null) {
+            if (savedArtist == null || !savedArtist.id.equals(artistParam.id)) {
+                artistUpdated = true;
+            }
+            artist = artistParam;
+        }
+        else if (savedArtist != null) {
+            artist = savedArtist;
+        }
+
+        return artistUpdated;
+    }
+
+    private void querySongs(String artistId) {
+        if (artistId != null && getNetworkUtil().isNetworkAvailable(getActivity())) {
             QueryTopTenTask topTenTask = new QueryTopTenTask();
-            topTenTask.execute(artist.id);
+            topTenTask.execute(artistId);
         }
         else {
             getNetworkUtil().showNoNetworkToast(getActivity());
         }
-        return view;
     }
 
     private List<SSSong> getSongList() {

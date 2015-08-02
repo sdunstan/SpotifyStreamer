@@ -29,6 +29,7 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
     protected MusicPlayer musicPlayer;
     private boolean bound = false;
     private ArrayList<SSSong> songList;
+    private SSSong currentSong;
 
     private Toast navToast;
 
@@ -53,6 +54,7 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         savedInstanceState.putParcelableArrayList(SONG_LIST_KEY, songList);
+        savedInstanceState.putParcelable(SONG_KEY, getSong());
     }
 
     @Override
@@ -60,6 +62,7 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
             songList = savedInstanceState.getParcelableArrayList(SONG_LIST_KEY);
+            currentSong = savedInstanceState.getParcelable(SONG_KEY);
         }
     }
 
@@ -97,6 +100,7 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
     public void previousTrack(View view) {
         if (musicPlayer.hasPrevious()) {
             musicPlayer.previous();
+            currentSong = musicPlayer.getCurrentSong();
         }
         else {
             showToast(R.string.previous_track_not_available);
@@ -110,6 +114,7 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
     public void nextTrack(View view) {
         if (musicPlayer.hasNext()) {
             musicPlayer.next();
+            currentSong = musicPlayer.getCurrentSong();
         }
         else {
             showToast(R.string.next_track_not_available);
@@ -122,15 +127,15 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
         getSongList().addAll(songList);
         if (musicPlayer != null) {
             musicPlayer.setPlaylist(songList);
+            currentSong = musicPlayer.getCurrentSong();
         }
     }
 
     public SSSong getSong() {
         if (musicPlayer != null) {
-            return musicPlayer.getCurrentSong();
+            currentSong = musicPlayer.getCurrentSong();
         }
-        Log.w(LOG_KEY, "No music player available yet. Try back later...");
-        return null;
+        return currentSong;
     }
 
 }

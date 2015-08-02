@@ -48,9 +48,9 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
         if (findViewById(R.id.top_ten_songs_container) != null) {
             twoPane = true;
             if (savedInstanceState == null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.top_ten_songs_container, new SongListFragment(), SONG_LIST_FRAGMENT_TAG)
-                        .commit();
+//                getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.top_ten_songs_container, new SongListFragment(), SONG_LIST_FRAGMENT_TAG)
+//                        .commit();
             }
         }
         else {
@@ -89,7 +89,6 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.top_ten_songs_container, SongListFragment.newInstance(artist), SONG_LIST_FRAGMENT_TAG)
                     .commit();
-
         }
         else {
             Intent startArtistDetailIntent = new Intent(this, SongListActivity.class);
@@ -101,6 +100,8 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
     @Override
     public void onSongSelected(SSSong song, int position) {
         if (twoPane) {
+            // The MusicPlayerActivity is a SongHolder. The NowPlayingFragment gets it's current song from the SongHolder.
+            musicPlayer.setTrack(position);
             FragmentManager fm = getSupportFragmentManager();
             NowPlayingFragment dialog = new NowPlayingFragment();
             dialog.setShowsDialog(true);
