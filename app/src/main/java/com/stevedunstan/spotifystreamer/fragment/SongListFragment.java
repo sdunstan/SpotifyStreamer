@@ -32,9 +32,6 @@ public class SongListFragment extends SSFragment {
 
     private ArrayAdapter<SSSong> topTenAdapter;
 
-    public SongListFragment() {
-    }
-
     public static SongListFragment newInstance(SSArtist artist) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(ARTIST_KEY, artist);
@@ -80,6 +77,7 @@ public class SongListFragment extends SSFragment {
     }
 
     private void updateAll(List<SSSong> songs) {
+        getTopTenAdapter().clear();
         getTopTenAdapter().addAll(songs);
         ((SongListHolder)getActivity()).updateSongList(songs);
     }
@@ -90,8 +88,6 @@ public class SongListFragment extends SSFragment {
         }
         return topTenAdapter;
     }
-
-
 
     private class QueryTopTenTask extends AsyncTask<String,Void,List<SSSong>> {
 

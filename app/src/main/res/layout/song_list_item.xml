@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:background="@color/background_material_light">
+    android:background="@color/background_material_light"
+    android:contentDescription="song list item">
 
 
     <ImageView
@@ -25,7 +26,8 @@
         android:gravity="center_vertical"
         android:singleLine="true"
         android:layout_alignTop="@+id/songImage"
-        android:layout_marginTop="6dp" />
+        android:layout_marginTop="6dp"
+        android:contentDescription="song name" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -37,6 +39,7 @@
         android:layout_toEndOf="@+id/songImage"
         android:layout_below="@+id/songTextView"
         android:gravity="center_vertical"
-        android:singleLine="true" />
+        android:singleLine="true"
+        android:contentDescription="album name" />
 
 </RelativeLayout>

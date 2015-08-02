@@ -8,6 +8,8 @@ public interface MusicPlayer {
     public static final String BROADCAST_ACTION = "com.stevedunstan.spotifystreamer.service.MusicPlayerBroadcast";
     // Handle: PLAYING, READY, PAUSED, PREPARING
     public static final String EXTENDED_DATA_MUSIC_PLAYER_STATE = "com.stevedunstan.spotifystreamer.service.MusicPlayerBroadcastState";
+    String EXTENDED_DATA_SONG_PROGRESS = "SONG-PROGRESS";
+    String EXTENDED_DATA_SONG_DURATION = "SONG-DURATION";
 
     void setPlaylist(List<SSSong> songList);
     void togglePlayPause();
@@ -21,6 +23,8 @@ public interface MusicPlayer {
     int getCurrentPosition();
     boolean isPlaying();
     boolean isPreparing();
+    boolean hasNext();
+    boolean hasPrevious();
 
     void seek(int position);
 }

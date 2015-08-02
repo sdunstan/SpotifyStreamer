@@ -30,7 +30,7 @@ public class SongListActivity extends MusicPlayerActivity implements SongSelecti
     public void onSongSelected(SSSong song, int position) {
         musicPlayer.setTrack(position);
         Intent intent = new Intent(this, NowPlayingActivity.class);
-        intent.putExtra(SONG_KEY, song);
+        intent.putExtra(SONG_KEY, musicPlayer.getCurrentSong());
         startActivity(intent);
     }
 }

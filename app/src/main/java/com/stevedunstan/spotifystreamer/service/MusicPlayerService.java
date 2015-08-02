@@ -1,5 +1,6 @@
 package com.stevedunstan.spotifystreamer.service;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -7,18 +8,21 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.stevedunstan.spotifystreamer.model.SSSong;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class MusicPlayerService extends Service implements MusicPlayer, MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnErrorListener {
 
     private static final String LOG_TAG = "MusicPlayerService";
+    private static final short NOTIFICATION_ID = 1;
 
     private MediaPlayer mediaPlayer;
     private MusicPlayerState state = MusicPlayerState.DESTROYED;
@@ -29,13 +33,15 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     // **** Begin public interface ****
     @Override
     public synchronized void setPlaylist(List<SSSong> songList) {
+        Log.i(LOG_TAG, "Setting song list  size is " + (songList != null ? songList.size() : -1));
         // TODO: memory management? Make a copy so the original can be GC'd?
         if (state != MusicPlayerState.READY) {
             destroyPlayer();
             initPlayer();
         }
 
-        this.songList = songList;
+        this.songList = new ArrayList<>();
+        this.songList.addAll(songList);
         this.currentTrack = (this.songList != null && this.songList.size() > 0) ? 0 : -1;
     }
 
@@ -64,20 +70,31 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     }
 
     @Override
-    public SSSong setTrack(int track) {
-        boolean continuePlaying = (state == MusicPlayerState.PLAYING);
+    public synchronized SSSong setTrack(int track) {
+        Log.i(LOG_TAG, "Setting current track to " + track);
+
+        boolean continuePlaying = (state == MusicPlayerState.PLAYING || state == MusicPlayerState.PREPARING);
         SSSong nextSong = null;
         if (songList != null && songList.size() > 0) {
-            if (track >= (songList.size()-1) || track < 0) {
+            if (track > (songList.size()-1) || track < 0) {
                 throw new IllegalStateException("Can't go to track because the track number is not on this playlist.");
             }
             currentTrack = track;
             nextSong = songList.get(currentTrack);
-            mediaPlayer.reset();
+            if (isPreparing()) {
+                Log.i(LOG_TAG, "Preparing, resetting player.");
+                destroyPlayer();
+                initPlayer();
+            }
+            else {
+                mediaPlayer.reset();
+            }
             state = MusicPlayerState.READY;
+            Log.i(LOG_TAG, "Track is in range: " + nextSong.name);
             if (continuePlaying) {
                 play();
             }
+            broadcastStateChange();
             return nextSong;
         }
         else {
@@ -97,9 +114,15 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
 
     @Override
     public synchronized SSSong getCurrentSong() {
+        Log.i(LOG_TAG, "Getting current song");
         SSSong currentSong = null;
-        if (songList != null && currentTrack > 0 && currentTrack < songList.size())
+        if (songList != null && currentTrack >= 0 && currentTrack < songList.size()) {
             currentSong = songList.get(currentTrack);
+            Log.i(LOG_TAG, "Found current song: " + currentSong.name);
+        }
+        else {
+            Log.i(LOG_TAG, String.format("Song list is null (%b) or current track out of range (%d). No current song.", songList == null, currentTrack));
+        }
         return currentSong;
     }
 
@@ -123,18 +146,39 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     public boolean isPreparing() {
         return state == MusicPlayerState.INTERMEDIATE || state == MusicPlayerState.PREPARING;
     }
+
+    @Override
+    public boolean hasNext() {
+        return songList != null && songList.size() > 1 && (currentTrack < (songList.size()-1));
+    }
+
+    @Override
+    public boolean hasPrevious() {
+        return songList != null && songList.size() > 1 && currentTrack > 0;
+    }
     // **** End public interface ****
 
     // **** Service lifecycle ****
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.i(LOG_TAG, "Creating music player service in foreground.");
+        Notification notification =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                        .setContentTitle("Spotify Streamer")
+                        .setContentText("Playing songz")
+                        .build();
+
+        this.startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(LOG_TAG, "Got start command...");
-        initPlayer();
+        if (state == MusicPlayerState.DESTROYED) {
+            initPlayer();
+        }
         return START_STICKY;
     }
 
@@ -188,7 +232,23 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     }
 
     private void broadcastStateChange() {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(BROADCAST_ACTION).putExtra(EXTENDED_DATA_MUSIC_PLAYER_STATE, state.name()));
+        Intent intent = new Intent(BROADCAST_ACTION)
+                .putExtra(EXTENDED_DATA_MUSIC_PLAYER_STATE, state.name());
+
+
+        if (state == MusicPlayerState.PLAYING) {
+            int duration = mediaPlayer.getDuration();
+            duration = (duration <= 0) ? 30 : duration / 1000;
+
+            int progress = mediaPlayer.getCurrentPosition();
+            progress /= 1000;
+
+            intent.putExtra(EXTENDED_DATA_SONG_DURATION, duration)
+                    .putExtra(EXTENDED_DATA_SONG_PROGRESS, progress);
+
+        }
+
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     // **** Media Player Callbacks ***

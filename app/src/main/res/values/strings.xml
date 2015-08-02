@@ -5,16 +5,19 @@
     <string name="artist_placeholder_text">Artist</string>
     <string name="title_activity_artist_albums_detail">Top 10 Tracks</string>
     <string name="artist_name_placeholder">Artist Name Placeholder</string>
-    <string name="search_hint">Search for an artist...</string>
+    <string name="search_hint">Search for an artist…</string>
     <string name="song_image_description">Song image</string>
     <string name="connection_error">Oh no, there is no network at the moment. Please try again later.</string>
     <string name="no_results_for_artist">No results found for that artist.</string>
     <string name="no_results_for_search">No results found for that search.</string>
     <string name="title_activity_now_playing">Now Playing</string>
-    <string name="hello_world">Hello world!</string>
     <string name="seekBarCurrentPosition">0:00</string>
-    <string name="songDurationTextView">1:00</string>
+    <string name="songDurationTextView">0:30</string>
     <string name="accessibilitySkipNext">Skip to next song</string>
     <string name="accessibilityPlayPause">Play or pause current song</string>
     <string name="accessibilitySkipPrevious">Skip to previous song</string>
+    <string name="next_track_not_available">Next track not available.</string>
+    <string name="previous_track_not_available">Previous track not available.</string>
+    <string name="album_artwork_content_description">Album artwork</string>
+    <string name="album_art_content_description">Album art</string>
 </resources>

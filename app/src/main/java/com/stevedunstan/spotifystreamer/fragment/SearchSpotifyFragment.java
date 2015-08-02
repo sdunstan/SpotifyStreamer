@@ -34,9 +34,6 @@ public class SearchSpotifyFragment extends SSFragment {
 
     private ArrayAdapter<SSArtist> arrayAdapter;
 
-    public SearchSpotifyFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View artistListFragment = inflater.inflate(R.layout.fragment_search_results, container, false);
@@ -57,12 +54,14 @@ public class SearchSpotifyFragment extends SSFragment {
 
         EditText searchText = (EditText) artistListFragment.findViewById(R.id.artistSearchQueryField);
         searchText.setText(getQuery());
+
         searchText.setOnEditorActionListener(
                 new TextView.OnEditorActionListener() {
                     @Override
                     public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                         boolean handled = false;
                         CharSequence searchValue = textView.getText();
+
                         if (actionId == EditorInfo.IME_ACTION_SEARCH && searchValue != null && searchValue.length() > 0) {
                             getArtistArrayAdapter().clear();
                             setQuery(searchValue.toString());

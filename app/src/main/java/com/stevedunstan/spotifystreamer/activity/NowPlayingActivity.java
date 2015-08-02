@@ -1,40 +1,27 @@
 package com.stevedunstan.spotifystreamer.activity;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 
 import com.stevedunstan.spotifystreamer.R;
-import com.stevedunstan.spotifystreamer.fragment.SongHolder;
-import com.stevedunstan.spotifystreamer.model.SSSong;
+import com.stevedunstan.spotifystreamer.fragment.NowPlayingFragment;
 
-public class NowPlayingActivity extends MusicPlayerActivity implements SongHolder{
-
-    private static final String SONG_KEY = "NowPlayingActivity_SONG_KEY";
-
-    private SSSong song;
-
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putParcelable(SONG_KEY, song);
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
+public class NowPlayingActivity extends MusicPlayerActivity {
+    private NowPlayingFragment nowPlayingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
-            song = savedInstanceState.getParcelable(SONG_KEY);
-        }
-        else {
-            song = getIntent().getParcelableExtra(MusicPlayerActivity.SONG_KEY);
-        }
-        setContentView(R.layout.activity_now_playing);
-    }
+        setContentView(R.layout.activity_artist_albums_detail);
 
-
-    @Override
-    public SSSong getSong() {
-        return song;
+        if (savedInstanceState == null) {
+            nowPlayingFragment = new NowPlayingFragment();
+            nowPlayingFragment.setShowsDialog(false);
+            FragmentManager fm = getSupportFragmentManager();
+            fm.beginTransaction()
+                    .add(R.id.top_ten_songs_container, nowPlayingFragment)
+                    .commit();
+        }
     }
 
 }

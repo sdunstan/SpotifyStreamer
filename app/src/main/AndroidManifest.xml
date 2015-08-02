@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.stevedunstan.spotifystreamer" >
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -26,7 +27,8 @@
             android:name=".activity.SongListActivity"
             android:label="@string/title_activity_artist_albums_detail"
             android:launchMode="singleTop"
-            android:parentActivityName=".activity.SearchSpotifyActivity" >
+            android:parentActivityName=".activity.SearchSpotifyActivity"
+            tools:ignore="UnusedAttribute">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.SearchSpotifyActivity" />
@@ -34,13 +36,17 @@
         <activity
             android:name=".activity.NowPlayingActivity"
             android:label="@string/title_activity_now_playing"
-            android:parentActivityName=".activity.SongListActivity" >
+            android:parentActivityName=".activity.SongListActivity"
+            tools:ignore="UnusedAttribute">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.SongListActivity" />
         </activity>
 
         <service android:name=".service.MusicPlayerService"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="cb87183c130bcff08a9435127a6134760e72a04b" />
     </application>
 
 </manifest>

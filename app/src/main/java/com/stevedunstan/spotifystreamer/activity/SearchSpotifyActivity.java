@@ -2,18 +2,25 @@ package com.stevedunstan.spotifystreamer.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 
+import com.crashlytics.android.Crashlytics;
 import com.stevedunstan.spotifystreamer.R;
 import com.stevedunstan.spotifystreamer.fragment.ArtistSelectionListener;
+import com.stevedunstan.spotifystreamer.fragment.NowPlayingFragment;
 import com.stevedunstan.spotifystreamer.fragment.SearchHolder;
 import com.stevedunstan.spotifystreamer.fragment.SongListFragment;
+import com.stevedunstan.spotifystreamer.fragment.SongSelectionListener;
 import com.stevedunstan.spotifystreamer.model.SSArtist;
 import com.stevedunstan.spotifystreamer.model.SSSong;
+import com.stevedunstan.spotifystreamer.service.MusicPlayerService;
 
 import java.util.ArrayList;
 
+import io.fabric.sdk.android.Fabric;
 
-public class SearchSpotifyActivity extends MusicPlayerActivity implements SearchHolder, ArtistSelectionListener {
+
+public class SearchSpotifyActivity extends MusicPlayerActivity implements SearchHolder, ArtistSelectionListener, SongSelectionListener {
 
     public static final String SEARCH_STRING_KEY = "SearchSpotifyActivitySearchString";
     private static final String ARTIST_SEARCH_RESULTS_KEY = "SearchSpotifyActivyArtistList";
@@ -29,6 +36,8 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
+        startService(new Intent(this, MusicPlayerService.class));
 
         if (savedInstanceState != null) {
             mSearchString = savedInstanceState.getString(SEARCH_STRING_KEY);
@@ -69,12 +78,10 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
     @Override
     public ArrayList<SSArtist> getArtistList() {
         if (mArtistList == null) {
-            mArtistList = new ArrayList<SSArtist>();
+            mArtistList = new ArrayList<>();
         }
         return mArtistList;
     }
-
-    private ArrayList<SSSong> songList;
 
     @Override
     public void onArtistSelected(SSArtist artist) {
@@ -88,6 +95,16 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
             Intent startArtistDetailIntent = new Intent(this, SongListActivity.class);
             startArtistDetailIntent.putExtra(SongListFragment.ARTIST_KEY, artist);
             startActivity(startArtistDetailIntent);
+        }
+    }
+
+    @Override
+    public void onSongSelected(SSSong song, int position) {
+        if (twoPane) {
+            FragmentManager fm = getSupportFragmentManager();
+            NowPlayingFragment dialog = new NowPlayingFragment();
+            dialog.setShowsDialog(true);
+            dialog.show(fm, "FOO");
         }
     }
 }
