@@ -156,21 +156,18 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     public boolean hasPrevious() {
         return songList != null && songList.size() > 1 && currentTrack > 0;
     }
+
+    @Override
+    public void poke() {
+        broadcastStateChange();
+    }
+
     // **** End public interface ****
 
     // **** Service lifecycle ****
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i(LOG_TAG, "Creating music player service in foreground.");
-        Notification notification =
-                new NotificationCompat.Builder(this)
-                        .setSmallIcon(android.R.drawable.sym_def_app_icon)
-                        .setContentTitle("Spotify Streamer")
-                        .setContentText("Playing songz")
-                        .build();
-
-        this.startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
@@ -196,12 +193,30 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
         return binder;
     }
 
+    private void notifyPlay(String song) {
+        Log.i(LOG_TAG, "Creating music player service in foreground.");
+        Notification notification =
+                new NotificationCompat.Builder(this)
+                        .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                        .setContentTitle("Spotify Streamer")
+                        .setContentText("Playing " + song)
+                        .build();
+
+        this.startForeground(NOTIFICATION_ID, notification);
+    }
+
+    private void releaseNotification() {
+        stopForeground(true);
+    }
+
     private void play() {
         state = MusicPlayerState.INTERMEDIATE;
         try {
-            mediaPlayer.setDataSource(songList.get(currentTrack).url);
+            SSSong song = songList.get(currentTrack);
+            mediaPlayer.setDataSource(song.url);
             mediaPlayer.prepareAsync();
             state = MusicPlayerState.PREPARING;
+            notifyPlay(song.name);
             broadcastStateChange();
         } catch (IOException e) {
             state = MusicPlayerState.READY;
@@ -224,6 +239,7 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     }
 
     private synchronized void destroyPlayer() {
+        releaseNotification();
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
@@ -234,7 +250,6 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     private void broadcastStateChange() {
         Intent intent = new Intent(BROADCAST_ACTION)
                 .putExtra(EXTENDED_DATA_MUSIC_PLAYER_STATE, state.name());
-
 
         if (state == MusicPlayerState.PLAYING) {
             int duration = mediaPlayer.getDuration();
@@ -267,6 +282,7 @@ public class MusicPlayerService extends Service implements MusicPlayer, MediaPla
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         Log.v(LOG_TAG, "ON COMPLETION CALLBACK. Resetting media player");
+        releaseNotification();
         mediaPlayer.reset();
         state = MusicPlayerState.READY;
         broadcastStateChange();

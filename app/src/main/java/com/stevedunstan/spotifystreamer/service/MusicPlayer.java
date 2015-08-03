@@ -22,6 +22,8 @@ public interface MusicPlayer {
     SSSong getCurrentSong();
     int getCurrentPosition();
     boolean isPlaying();
+
+    void poke();
     boolean isPreparing();
     boolean hasNext();
     boolean hasPrevious();

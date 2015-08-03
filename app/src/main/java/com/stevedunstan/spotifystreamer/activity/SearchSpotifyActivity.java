@@ -3,6 +3,7 @@ package com.stevedunstan.spotifystreamer.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.stevedunstan.spotifystreamer.R;
@@ -22,6 +23,8 @@ import io.fabric.sdk.android.Fabric;
 
 public class SearchSpotifyActivity extends MusicPlayerActivity implements SearchHolder, ArtistSelectionListener, SongSelectionListener {
 
+    private final String LOG_TAG = SearchSpotifyActivity.class.getName();
+
     public static final String SEARCH_STRING_KEY = "SearchSpotifyActivitySearchString";
     private static final String ARTIST_SEARCH_RESULTS_KEY = "SearchSpotifyActivyArtistList";
     private static final String SONG_LIST_FRAGMENT_TAG = "SongListFragment";
@@ -36,6 +39,7 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(LOG_TAG, "Services startup...");
         Fabric.with(this, new Crashlytics());
         startService(new Intent(this, MusicPlayerService.class));
 
@@ -45,16 +49,15 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
         }
 
         setContentView(R.layout.activity_search_spotify);
-        if (findViewById(R.id.top_ten_songs_container) != null) {
-            twoPane = true;
-            if (savedInstanceState == null) {
-//                getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.top_ten_songs_container, new SongListFragment(), SONG_LIST_FRAGMENT_TAG)
-//                        .commit();
-            }
-        }
-        else {
-            twoPane = false;
+        twoPane = (findViewById(R.id.top_ten_songs_container) != null);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isFinishing()) {
+            Log.i(LOG_TAG, "Destroying service.");
+            stopService(new Intent(this, MusicPlayerService.class));
         }
     }
 

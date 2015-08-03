@@ -29,9 +29,6 @@ import com.stevedunstan.spotifystreamer.service.MusicPlayer;
 import com.stevedunstan.spotifystreamer.service.MusicPlayerState;
 import com.stevedunstan.spotifystreamer.util.Images;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class NowPlayingFragment extends DialogFragment {
 
     private static final String LOG_TAG = NowPlayingFragment.class.getName();

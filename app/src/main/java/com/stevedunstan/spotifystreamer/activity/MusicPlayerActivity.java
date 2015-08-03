@@ -38,6 +38,7 @@ public abstract class MusicPlayerActivity extends ActionBarActivity implements S
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             MusicPlayerService.MusicServiceBinder binder = (MusicPlayerService.MusicServiceBinder) iBinder;
             musicPlayer = binder.getService();
+            musicPlayer.poke();
             bound = true;
             Log.i(LOG_KEY, "musicPlayer bound!");
         }
