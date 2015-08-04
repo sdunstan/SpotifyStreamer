@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.stevedunstan.spotifystreamer.R;
 import com.stevedunstan.spotifystreamer.fragment.ArtistSelectionListener;
 import com.stevedunstan.spotifystreamer.fragment.NowPlayingFragment;
@@ -17,8 +16,6 @@ import com.stevedunstan.spotifystreamer.model.SSSong;
 import com.stevedunstan.spotifystreamer.service.MusicPlayerService;
 
 import java.util.ArrayList;
-
-import io.fabric.sdk.android.Fabric;
 
 
 public class SearchSpotifyActivity extends MusicPlayerActivity implements SearchHolder, ArtistSelectionListener, SongSelectionListener {
@@ -40,7 +37,7 @@ public class SearchSpotifyActivity extends MusicPlayerActivity implements Search
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(LOG_TAG, "Services startup...");
-        Fabric.with(this, new Crashlytics());
+        // Fabric.with(this, new Crashlytics());
         startService(new Intent(this, MusicPlayerService.class));
 
         if (savedInstanceState != null) {
